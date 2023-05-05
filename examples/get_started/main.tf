@@ -18,8 +18,8 @@ resource "elestio_project" "project" {
 }
 
 module "cluster" {
-  # source = "elestio-examples/keydb-cluster/elestio"
-  source = "../.." # If you want to use the local version
+  source = "elestio-examples/keydb-cluster/elestio"
+  # source = "../.." # If you want to use the local version
 
   project_id    = elestio_project.project.id
   server_name   = "keydb"
