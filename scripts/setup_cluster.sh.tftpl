@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# Write ssh key in a temporary file (deleted later in the script)
+filename="tmp_private_key.txt"
+echo "${ssh_private_key}" > $${filename}
+chmod -R 600 $${filename}
+
+# Update the keyfile for authentication on all nodes if needed
+%{ for node in nodes ~}
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $${filename} root@${node.ipv4} <<-SSH
+  if ! grep -cx "${keydb_masterauth_password}" /opt/proxy_24814.secret; then
+
+    # Update password in .htpasswd
+    htpasswd -D /opt/elestio/nginx/conf.d/.htpasswd root
+    echo "${keydb_masterauth_password}" | htpasswd -i /opt/elestio/nginx/conf.d/.htpasswd root
+
+    # Update password for dashboard ui
+    echo "${keydb_masterauth_password}" > /opt/proxy_24814.secret
+
+    # Update password in .env
+    sed -i "/SOFTWARE_PASSWORD=/c\SOFTWARE_PASSWORD=${keydb_masterauth_password}" /opt/app/.env
+
+    # Restart docker with the new config
+
+    cd /opt/app
+    docker-compose down
+
+    rm -rf insight
+    mkdir -p insight
+    chmod -R 777 insight
+
+    docker-compose up -d
+    sleep 15
+
+    curl --header "Content-Type: application/json" --request POST --data '{ "name": "localRedis", "connectionType": "STANDALONE", "host": "172.17.0.1","port": 23647,"password": "${keydb_masterauth_password}"}' http://172.17.0.1:8001/api/instance/
+  fi
+SSH
+%{ endfor ~}
+
+
+%{ for index, node in nodes ~}
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $${filename} root@${node.ipv4} <<-SSH
+  clusterConfig="--masterauth ${keydb_masterauth_password} --multi-master yes --active-replica yes ${join(" ", [for i, n in nodes : format("--replicaof %s %s", n.global_ip, n.port) if i != index])}"
+  sed -i "/CLUSTER_OPTIONS=/c\CLUSTER_OPTIONS=\$${clusterConfig}" /opt/app/.env
+
+  cd /opt/app
+  docker-compose down
+  docker-compose up -d
+  sleep 5
+SSH
+%{ endfor ~}
+
+# Delete temporary ssh key file
+rm $${filename}

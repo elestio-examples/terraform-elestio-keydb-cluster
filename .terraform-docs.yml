@@ -1,0 +1,116 @@
+formatter: "" # this is required
+
+version: ""
+
+header-from: main.tf
+footer-from: ""
+
+recursive:
+  enabled: false
+  path: modules
+
+sections:
+  hide: []
+  show: []
+
+content: |-
+  # Elestio KeyDB Cluster Terraform module
+
+  If you can't afford for your database to be down for even a few minutes, a Multi-Master cluster is a great option to ensure high availability.
+
+  A multi-master scenario means that one node can be taken offline (e.g. for maintenance or upgrade purposes) without impacting availability, as the other node will continue to serve production traffic. Further, it doubles your capacity to read or write to the database and provides an additional layer of protection against data loss.
+
+  {{ .Header }}
+
+  This module deploy multiple KeyDB nodes on Elestio and commands are automatically executed to link them using the multi-master feature.
+
+  ## Usage
+
+  There is a [ready-to-deploy example](https://github.com/elestio-examples/terraform-elestio-keydb-cluster/tree/main/examples/get_started) included in the [examples](https://github.com/elestio-examples/terraform-elestio-keydb-cluster/tree/main/examples) folder but simple usage is as follows:
+
+  ```hcl
+  {{ include "examples/doc/main.tf" }}
+  ```
+
+  ## Examples
+
+  - [Get Started](https://github.com/elestio-examples/terraform-elestio-keydb-cluster/tree/main/examples/get_started) - Ready-to-deploy example which creates KeyDB Cluster on Elestio with Terraform in 5 minutes.
+
+
+  ## How to use Multi-Master cluster
+
+  Use `terraform output cluster_database_admin` command to output database secrets:
+
+  ```bash
+  # cluster_database_admin
+  [
+    {
+      "command" = "redis-cli -h keydb-0-u525.vm.elestio.app -p 23647 -a '****'"
+      "host" = "keydb-0-u525.vm.elestio.app"
+      "password" = "****"
+      "port" = "23647"
+      "user" = "root"
+    },
+    {
+      "command" = "redis-cli -h keydb-1-u525.vm.elestio.app -p 23647 -a '****'"
+      "host" = "keydb-1-u525.vm.elestio.app"
+      "password" = "****"
+      "port" = "23647"
+      "user" = "root"
+    },
+  ]
+  ```
+
+  ```js
+  ////////////// NodeJS sample //////////////
+  const Redis = require("ioredis");
+  const cluster = new Redis.Cluster([
+    { port: 23647, password: "****", host: "keydb-0-u525.vm.elestio.app" },
+    { port: 23647, password: "****", host: "keydb-1-u525.vm.elestio.app" },
+  ]);
+
+  cluster.set("foo", "bar");
+  cluster.get("foo", (err, res) => {
+    // res === 'bar'
+  });
+  ////////////// ////////////// ////////////// //////////////
+  ```
+
+  {{ .Footer }}
+  {{ .Inputs }}
+  {{ .Modules }}
+  {{ .Outputs }}
+  {{ .Providers }}
+  {{ .Requirements }}
+  {{ .Resources }}
+
+output:
+  file: ""
+  mode: inject
+  template: |-
+    <!-- BEGIN_TF_DOCS -->
+    {{ .Content }}
+    <!-- END_TF_DOCS -->
+
+output-values:
+  enabled: false
+  from: ""
+
+sort:
+  enabled: true
+  by: name
+
+settings:
+  anchor: true
+  color: true
+  default: true
+  description: false
+  escape: true
+  hide-empty: false
+  html: true
+  indent: 2
+  lockfile: true
+  read-comments: true
+  required: true
+  sensitive: true
+  type: true
