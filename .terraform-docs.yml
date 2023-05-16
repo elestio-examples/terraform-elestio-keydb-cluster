@@ -45,7 +45,7 @@ content: |-
   {{ include "examples/doc/readme_output.sh" }}
   ```
 
-  Here is an example of how to use the KeyDB cluster and all its nodes in the [Javascript client](https://opensearch.org/docs/latest/clients/javascript/index/).
+  Here is an example of how to use the KeyDB cluster and all its nodes in the Javascript client.
 
   ```js
   {{ include "examples/doc/readme_how_to_use.js" }}

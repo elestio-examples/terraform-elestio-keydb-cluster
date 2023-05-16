@@ -91,7 +91,7 @@ Use `terraform output cluster_database_admin` command to output database secrets
 ]
 ```
 
-Here is an example of how to use the KeyDB cluster and all its nodes in the [Javascript client](https://opensearch.org/docs/latest/clients/javascript/index/).
+Here is an example of how to use the KeyDB cluster and all its nodes in the Javascript client.
 
 ```js
 // Javascript example
