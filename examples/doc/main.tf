@@ -3,11 +3,9 @@
 module "cluster" {
   source = "elestio-examples/keydb-cluster/elestio"
 
-  project_id    = "1234"
-  server_name   = "keydb"
-  keydb_version = null # keep `null` for recommended Elestio version
-  support_level = "level1"
-  admin_email   = "admin@example.com"
+  project_id  = "1234"
+  server_name = "keydb"
+  admin_email = "admin@example.com"
   nodes = [
     {
       provider_name = "hetzner"

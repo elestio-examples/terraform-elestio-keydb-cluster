@@ -18,14 +18,12 @@ resource "elestio_project" "project" {
 }
 
 module "cluster" {
-  source = "elestio-examples/keydb-cluster/elestio"
-  # source = "../.." # If you want to use the local version
+  # source = "elestio-examples/keydb-cluster/elestio"
+  source = "../.." # If you want to use the local version
 
-  project_id    = elestio_project.project.id
-  server_name   = "keydb"
-  keydb_version = null
-  support_level = "level1"
-  admin_email   = var.elestio_email
+  project_id  = elestio_project.project.id
+  server_name = "keydb"
+  admin_email = var.elestio_email
 
   # Read the documentation to see the full providers/datacenters/server_types list:
   # https://registry.terraform.io/providers/elestio/elestio/latest/docs/guides/3_providers_datacenters_server_types

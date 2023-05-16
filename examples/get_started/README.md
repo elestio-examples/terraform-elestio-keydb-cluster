@@ -91,9 +91,12 @@ Use `terraform output cluster_database_admin` command to output database secrets
 ]
 ```
 
+Here is an example of how to use the KeyDB cluster and all its nodes in the [Javascript client](https://opensearch.org/docs/latest/clients/javascript/index/).
+
 ```js
-////////////// NodeJS sample //////////////
+// Javascript example
 const Redis = require("ioredis");
+
 const cluster = new Redis.Cluster([
   { port: 23647, password: "****", host: "keydb-0-u525.vm.elestio.app" },
   { port: 23647, password: "****", host: "keydb-1-u525.vm.elestio.app" },
@@ -103,5 +106,13 @@ cluster.set("foo", "bar");
 cluster.get("foo", (err, res) => {
   // res === 'bar'
 });
-////////////// ////////////// ////////////// //////////////
 ```
+
+## Scale the nodes
+
+To adjust the cluster size:
+
+- Adding nodes: Run `terraform apply` after adding a new node, and it will be seamlessly integrated into the cluster.
+- Removing nodes: The excess nodes will cleanly leave the cluster on the next `terraform apply`.
+
+Please note that changing the node count requires a reboot, which may result in a few minutes of service downtime.

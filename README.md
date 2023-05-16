@@ -19,11 +19,9 @@ There is a [ready-to-deploy example](https://github.com/elestio-examples/terrafo
 module "cluster" {
   source = "elestio-examples/keydb-cluster/elestio"
 
-  project_id    = "1234"
-  server_name   = "keydb"
-  keydb_version = null # keep `null` for recommended Elestio version
-  support_level = "level1"
-  admin_email   = "admin@example.com"
+  project_id  = "1234"
+  server_name = "keydb"
+  admin_email = "admin@example.com"
   nodes = [
     {
       provider_name = "hetzner"
@@ -69,37 +67,48 @@ Use `terraform output cluster_database_admin` command to output database secrets
 ```bash
 # cluster_database_admin
 [
-{
-"command" = "redis-cli -h keydb-0-u525.vm.elestio.app -p 23647 -a '****'"
-"host" = "keydb-0-u525.vm.elestio.app"
-"password" = "****"
-"port" = "23647"
-"user" = "root"
-},
-{
-"command" = "redis-cli -h keydb-1-u525.vm.elestio.app -p 23647 -a '****'"
-"host" = "keydb-1-u525.vm.elestio.app"
-"password" = "****"
-"port" = "23647"
-"user" = "root"
-},
+  {
+    "command" = "redis-cli -h keydb-0-u525.vm.elestio.app -p 23647 -a '****'"
+    "host" = "keydb-0-u525.vm.elestio.app"
+    "password" = "****"
+    "port" = "23647"
+    "user" = "root"
+  },
+  {
+    "command" = "redis-cli -h keydb-1-u525.vm.elestio.app -p 23647 -a '****'"
+    "host" = "keydb-1-u525.vm.elestio.app"
+    "password" = "****"
+    "port" = "23647"
+    "user" = "root"
+  },
 ]
 ```
 
+Here is an example of how to use the KeyDB cluster and all its nodes in the [Javascript client](https://opensearch.org/docs/latest/clients/javascript/index/).
+
 ```js
-////////////// NodeJS sample //////////////
+// Javascript example
 const Redis = require("ioredis");
+
 const cluster = new Redis.Cluster([
-{ port: 23647, password: "****", host: "keydb-0-u525.vm.elestio.app" },
-{ port: 23647, password: "****", host: "keydb-1-u525.vm.elestio.app" },
+  { port: 23647, password: "****", host: "keydb-0-u525.vm.elestio.app" },
+  { port: 23647, password: "****", host: "keydb-1-u525.vm.elestio.app" },
 ]);
 
 cluster.set("foo", "bar");
 cluster.get("foo", (err, res) => {
-// res === 'bar'
+  // res === 'bar'
 });
-////////////// ////////////// ////////////// //////////////
 ```
+
+## Scale the nodes
+
+To adjust the cluster size:
+
+- Adding nodes: Run `terraform apply` after adding a new node, and it will be seamlessly integrated into the cluster.
+- Removing nodes: The excess nodes will cleanly leave the cluster on the next `terraform apply`.
+
+Please note that changing the node count requires a reboot, which may result in a few minutes of service downtime.
 
 
 ## Inputs
@@ -107,12 +116,12 @@ cluster.get("foo", (err, res) => {
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_admin_email"></a> [admin\_email](#input\_admin\_email) | Related [documentation](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/keydb#admin_email) `#admin_email` | `string` | n/a | yes |
-| <a name="input_keydb_version"></a> [keydb\_version](#input\_keydb\_version) | Related [documentation](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/keydb#version) `#version` | `string` | n/a | yes |
+| <a name="input_keydb_version"></a> [keydb\_version](#input\_keydb\_version) | Related [documentation](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/keydb#version) `#version`.<br>Use `null` for recommended Elestio version. | `string` | `null` | no |
 | <a name="input_nodes"></a> [nodes](#input\_nodes) | See [providers list](https://registry.terraform.io/providers/elestio/elestio/latest/docs/guides/3_providers_datacenters_server_types) | <pre>list(<br>    object({<br>      provider_name = string<br>      datacenter    = string<br>      server_type   = string<br>    })<br>  )</pre> | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Related [documentation](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/keydb#project_id) `#project_id` | `string` | n/a | yes |
 | <a name="input_server_name"></a> [server\_name](#input\_server\_name) | Related [documentation](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/keydb#server_name) `#server_name` | `string` | n/a | yes |
 | <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | A local SSH connection is required to run the commands on all nodes to create the cluster. | <pre>object({<br>    key_name    = string<br>    public_key  = string<br>    private_key = string<br>  })</pre> | n/a | yes |
-| <a name="input_support_level"></a> [support\_level](#input\_support\_level) | Related [documentation](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/keydb#support_level) `#support_level` | `string` | n/a | yes |
+| <a name="input_support_level"></a> [support\_level](#input\_support\_level) | Related [documentation](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/keydb#support_level) `#support_level` | `string` | `"level1"` | no |
 ## Modules
 
 No modules.

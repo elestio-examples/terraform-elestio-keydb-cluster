@@ -36,14 +36,17 @@ variable "nodes" {
 variable "keydb_version" {
   type        = string
   nullable    = true
+  default     = null
   description = <<-EOF
-    Related [documentation](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/keydb#version) `#version`
+    Related [documentation](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/keydb#version) `#version`.
+    Use `null` for recommended Elestio version.
   EOF
 }
 
 variable "support_level" {
   type        = string
   nullable    = false
+  default     = "level1"
   description = <<-EOF
     Related [documentation](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/keydb#support_level) `#support_level`
   EOF
