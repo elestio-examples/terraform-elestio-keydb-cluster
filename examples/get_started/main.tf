@@ -1,4 +1,5 @@
 terraform {
+  required_version = ">= 0.13"
   required_providers {
     elestio = {
       source = "elestio/elestio"
@@ -13,49 +14,46 @@ provider "elestio" {
 
 resource "elestio_project" "project" {
   name             = "KeyDB Cluster"
-  description      = "Ready-to-deploy terraform example"
   technical_emails = var.elestio_email
 }
 
-module "cluster" {
+module "keydb_cluster" {
   source = "elestio-examples/keydb-cluster/elestio"
-  # source = "../.." # If you want to use the local version
+  # source = "../.." # Use this line to test the module locally
 
-  project_id  = elestio_project.project.id
-  server_name = "keydb"
-  admin_email = var.elestio_email
-
-  # Read the documentation to see the full providers/datacenters/server_types list:
-  # https://registry.terraform.io/providers/elestio/elestio/latest/docs/guides/3_providers_datacenters_server_types
+  project_id           = elestio_project.project.id
+  keydb_admin_password = var.keydb_password
+  ssh_key = {
+    key_name    = var.ssh_key_name
+    public_key  = var.ssh_public_key
+    private_key = var.ssh_private_key
+  }
   nodes = [
     {
-      provider_name = "hetzner"
-      datacenter    = "fsn1" # germany
-      server_type   = "SMALL-1C-2G"
+      server_name   = "keycloak-france"
+      provider_name = "scaleway"
+      datacenter    = "fr-par-1"
+      server_type   = "SMALL-2C-2G"
     },
     {
-      provider_name = "hetzner"
-      datacenter    = "hel1" # finlande
-      server_type   = "SMALL-1C-2G"
+      server_name   = "keycloak-netherlands"
+      provider_name = "scaleway"
+      datacenter    = "nl-ams-1"
+      server_type   = "SMALL-2C-2G"
     },
+    # You can add more nodes here, but you need to have enough resources quota
+    # You can see and udpdate your resources quota on https://dash.elest.io/account/add-quota
   ]
-
-  ssh_key = {
-    key_name    = "admin"                   # or var.ssh_key.name
-    public_key  = file("~/.ssh/id_rsa.pub") # or var.ssh_key.public_key
-    private_key = file("~/.ssh/id_rsa")     # or var.ssh_key.private_key
-    # See variables.tf and secrets.tfvars file comments if your want to use variables instead of file() function.
-  }
 }
 
-output "cluster_admin" {
-  value       = module.cluster.cluster_admin
+output "keydb_cluster_admin" {
+  value       = module.keydb_cluster.keydb_admin
   sensitive   = true
   description = "RedisInsight (Redis GUI compatible with KeyDB) connection infos/secrets"
 }
 
-output "cluster_database_admin" {
-  value       = module.cluster.cluster_database_admin
+output "keydb_cluster_database_admin" {
+  value       = module.keydb_cluster.keydb_database_admin
   sensitive   = true
   description = "Database connection infos/secrets"
 }

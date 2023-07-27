@@ -31,31 +31,36 @@ Some knowledge of [terraform](https://developer.hashicorp.com/terraform/intro) i
    terraform show
    ```
 
+   It will:
+
+   - Create a new project in your Elestio account
+   - Build a KeyDB cluster with the number of nodes you specified
+
 3. You can use the `terraform output` command to print the output block of your main.tf file:
 
    ```bash
-   terraform output cluster_admin # RedisInsight secrets
-   terraform output cluster_database_admin # Database secrets
+   terraform output keydb_cluster_admin # RedisInsight secrets
+   terraform output keydb_cluster_database_admin # Database secrets
    ```
 
 ## Testing
 
-Use `terraform output cluster_admin` command to output RedisInsight secrets:
+Use `terraform output keydb_cluster_admin` command to output RedisInsight secrets:
 
 ```bash
-# cluster_admin
-[
-  {
-    "password" = "****"
-    "url" = "https://keydb-0-u525.vm.elestio.app:24814/"
+# keydb_cluster_admin
+{
+  "keydb-france" = {
+    "password" = "*****"
+    "url" = "https://keydb-france-u525.vm.elestio.app:24814/"
     "user" = "root"
-  },
-  {
-    "password" = "****"
-    "url" = "https://keydb-1-u525.vm.elestio.app:24814/"
+  }
+  "keydb-netherlands" = {
+    "password" = "*****"
+    "url" = "https://keydb-netherlands-u525.vm.elestio.app:24814/"
     "user" = "root"
-  },
-]
+  }
+}
 ```
 
 Log in to both URLs with the credentials.
@@ -69,41 +74,45 @@ When you restart it, it automatically updates with the new data.
 
 ## How to use Multi-Master cluster
 
-Use `terraform output cluster_database_admin` command to output database secrets:
+Use `terraform output keydb_cluster_database_admin` command to output database secrets:
 
 ```bash
-# cluster_database_admin
-[
-  {
-    "command" = "redis-cli -h keydb-0-u525.vm.elestio.app -p 23647 -a '****'"
-    "host" = "keydb-0-u525.vm.elestio.app"
-    "password" = "****"
+# keydb_cluster_database_admin
+{
+  "keydb-france" = {
+    "command" = "redis-cli -h keydb-france-u525.vm.elestio.app -p 23647 -a '*****'"
+    "host" = "keydb-france-u525.vm.elestio.app"
+    "password" = "*****"
     "port" = "23647"
     "user" = "root"
-  },
-  {
-    "command" = "redis-cli -h keydb-1-u525.vm.elestio.app -p 23647 -a '****'"
-    "host" = "keydb-1-u525.vm.elestio.app"
-    "password" = "****"
+  }
+  "keydb-netherlands" = {
+    "command" = "redis-cli -h keydb-netherlands-u525.vm.elestio.app -p 23647 -a '*****'"
+    "host" = "keydb-netherlands-u525.vm.elestio.app"
+    "password" = "*****"
     "port" = "23647"
     "user" = "root"
-  },
-]
+  }
+}
 ```
 
 Here is an example of how to use the KeyDB cluster and all its nodes in the Javascript client.
 
 ```js
 // Javascript example
-const Redis = require("ioredis");
+const Redis = require('ioredis');
 
 const cluster = new Redis.Cluster([
-  { port: 23647, password: "****", host: "keydb-0-u525.vm.elestio.app" },
-  { port: 23647, password: "****", host: "keydb-1-u525.vm.elestio.app" },
+  { port: 23647, password: '****', host: 'keydb-france-u525.vm.elestio.app' },
+  {
+    port: 23647,
+    password: '****',
+    host: 'keydb-netherlands-u525.vm.elestio.app',
+  },
 ]);
 
-cluster.set("foo", "bar");
-cluster.get("foo", (err, res) => {
+cluster.set('foo', 'bar');
+cluster.get('foo', (err, res) => {
   // res === 'bar'
 });
 ```
@@ -112,7 +121,7 @@ cluster.get("foo", (err, res) => {
 
 To adjust the cluster size:
 
-- Adding nodes: Run `terraform apply` after adding a new node, and it will be seamlessly integrated into the cluster.
+- Adding nodes: Run `terraform apply` after adding a new node in the config, and it will be seamlessly integrated into the cluster.
 - Removing nodes: The excess nodes will cleanly leave the cluster on the next `terraform apply`.
 
-Please note that changing the node count requires a reboot, which may result in a few minutes of service downtime.
+Please note that changing the node count requires to change the .env of existing nodes. This is done automatically by the module.

@@ -1,39 +1,39 @@
-# Read the module documentation if you need information about a field below
-
-module "cluster" {
+module "keydb_cluster" {
   source = "elestio-examples/keydb-cluster/elestio"
 
-  project_id  = "1234"
-  server_name = "keydb"
-  admin_email = "admin@example.com"
+  project_id           = "1234"
+  keydb_admin_password = var.keydb_password
+  ssh_key = {
+    key_name    = var.ssh_key_name
+    public_key  = var.ssh_public_key
+    private_key = var.ssh_private_key
+  }
   nodes = [
     {
-      provider_name = "hetzner"
-      datacenter    = "fsn1" # germany
-      server_type   = "SMALL-1C-2G"
+      server_name   = "keycloak-france"
+      provider_name = "scaleway"
+      datacenter    = "fr-par-1"
+      server_type   = "SMALL-2C-2G"
     },
     {
-      provider_name = "hetzner"
-      datacenter    = "hel1" # finlande
-      server_type   = "SMALL-1C-2G"
+      server_name   = "keycloak-netherlands"
+      provider_name = "scaleway"
+      datacenter    = "nl-ams-1"
+      server_type   = "SMALL-2C-2G"
     },
-    # You can add more nodes below if you need
+    # You can add more nodes here, but you need to have enough resources quota
+    # You can see and udpdate your resources quota on https://dash.elest.io/account/add-quota
   ]
-  ssh_key = {
-    key_name    = "admin"
-    public_key  = file("~/.ssh/id_rsa.pub")
-    private_key = file("~/.ssh/id_rsa")
-  }
 }
 
-output "cluster_admin" {
-  value       = module.cluster.cluster_admin
+output "keydb_cluster_admin" {
+  value       = module.keydb_cluster.keydb_admin
   sensitive   = true
   description = "RedisInsight (Redis GUI compatible with KeyDB) connection infos/secrets"
 }
 
-output "cluster_database_admin" {
-  value       = module.cluster.cluster_database_admin
+output "keydb_cluster_database_admin" {
+  value       = module.keydb_cluster.keydb_database_admin
   sensitive   = true
   description = "Database connection infos/secrets"
 }

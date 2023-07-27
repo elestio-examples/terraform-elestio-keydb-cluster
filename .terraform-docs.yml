@@ -1,9 +1,9 @@
-formatter: "" # this is required
+formatter: '' # this is required
 
-version: ""
+version: ''
 
 header-from: main.tf
-footer-from: ""
+footer-from: ''
 
 recursive:
   enabled: false
@@ -16,30 +16,34 @@ sections:
 content: |-
   # Elestio KeyDB Cluster Terraform module
 
-  If you can't afford for your database to be down for even a few minutes, a Multi-Master cluster is a great option to ensure high availability.
+  ## Benefits of a KeyDB cluster
+
+  A Multi-Master KeyDB cluster is a great option to ensure high availability, it allows for easy scalability to meet changing demands without replacing the entire system.
+  It can handle more requests without slowing down or crashing, and provides fault tolerance to ensure that the system remains operational.
 
   A multi-master scenario means that one node can be taken offline (e.g. for maintenance or upgrade purposes) without impacting availability, as the other node will continue to serve production traffic. Further, it doubles your capacity to read or write to the database and provides an additional layer of protection against data loss.
 
   {{ .Header }}
 
-  This module deploy multiple KeyDB nodes on Elestio and commands are automatically executed to link them using the multi-master feature.
-
   ## Usage
-
-  There is a [ready-to-deploy example](https://github.com/elestio-examples/terraform-elestio-keydb-cluster/tree/main/examples/get_started) included in the [examples](https://github.com/elestio-examples/terraform-elestio-keydb-cluster/tree/main/examples) folder but simple usage is as follows:
 
   ```hcl
   {{ include "examples/doc/main.tf" }}
   ```
 
+  ## What the module does
+
+  1. It configures the KeyDB nodes to be clustered together.
+
+  2. If you change the number of nodes and re-apply, it will automatically reconfigure the cluster for you without data-loss.
+
   ## Examples
 
-  - [Get Started](https://github.com/elestio-examples/terraform-elestio-keydb-cluster/tree/main/examples/get_started) - Ready-to-deploy example which creates KeyDB Cluster on Elestio with Terraform in 5 minutes.
-
+  - [Get Started](https://github.com/elestio-examples/terraform-elestio-keydb-cluster/tree/main/examples/get_started) - Ready-to-deploy example which creates a KeyDB Cluster in minutes.
 
   ## How to use Multi-Master cluster
 
-  Use `terraform output cluster_database_admin` command to output database secrets:
+  Use `terraform output keydb_cluster_database_admin` command to output database secrets:
 
   ```bash
   {{ include "examples/doc/readme_output.sh" }}
@@ -55,10 +59,10 @@ content: |-
 
   To adjust the cluster size:
 
-  - Adding nodes: Run `terraform apply` after adding a new node, and it will be seamlessly integrated into the cluster.
+  - Adding nodes: Run `terraform apply` after adding a new node in the config, and it will be seamlessly integrated into the cluster.
   - Removing nodes: The excess nodes will cleanly leave the cluster on the next `terraform apply`.
 
-  Please note that changing the node count requires a reboot, which may result in a few minutes of service downtime.
+  Please note that changing the node count requires to change the .env of existing nodes. This is done automatically by the module.
 
   {{ .Footer }}
   {{ .Inputs }}
@@ -69,7 +73,7 @@ content: |-
   {{ .Resources }}
 
 output:
-  file: ""
+  file: ''
   mode: inject
   template: |-
     <!-- BEGIN_TF_DOCS -->
@@ -78,7 +82,7 @@ output:
 
 output-values:
   enabled: false
-  from: ""
+  from: ''
 
 sort:
   enabled: true
