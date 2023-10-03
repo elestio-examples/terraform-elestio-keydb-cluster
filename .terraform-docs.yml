@@ -22,28 +22,77 @@ content: |-
   It can handle more requests without slowing down or crashing, and provides fault tolerance to ensure that the system remains operational.
 
   A multi-master scenario means that one node can be taken offline (e.g. for maintenance or upgrade purposes) without impacting availability, as the other node will continue to serve production traffic. Further, it doubles your capacity to read or write to the database and provides an additional layer of protection against data loss.
-
   {{ .Header }}
+  ## Module requirements
 
-  ## Usage
+  - 1 Elestio account https://dash.elest.io/signup
+  - 1 API key https://dash.elest.io/account/security
+  - 1 SSH public/private key (see how to create one [here](https://registry.terraform.io/providers/elestio/elestio/latest/docs/guides/ssh_keys))
+
+  ## Module usage
+
+  This is a minimal example of how to use the module:
 
   ```hcl
-  {{ include "examples/doc/main.tf" }}
+  {{ include "examples/doc/usage.tf" }}
   ```
 
-  ## What the module does
+  Keep your keydb password safe, you will need it to access the admin panel.
 
-  1. It configures the KeyDB nodes to be clustered together.
+  If you want to know more about node configuration, check the keydb service documentation [here](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/keydb).
 
-  2. If you change the number of nodes and re-apply, it will automatically reconfigure the cluster for you without data-loss.
+  If you want to choose your own provider, datacenter or server type, check the guide [here](https://registry.terraform.io/providers/elestio/elestio/latest/docs/guides/providers_datacenters_server_types).
 
-  ## Examples
+  If you want to generated a valid SSH Key, check the guide [here](https://registry.terraform.io/providers/elestio/elestio/latest/docs/guides/ssh_keys).
 
-  - [Get Started](https://github.com/elestio-examples/terraform-elestio-keydb-cluster/tree/main/examples/get_started) - Ready-to-deploy example which creates a KeyDB Cluster in minutes.
+  If you add more nodes, you may attains the resources limit of your account, please visit your account [quota page](https://dash.elest.io/account/add-quota).
 
-  ## How to use Multi-Master cluster
+  ## Quick configuration
 
-  Use `terraform output keydb_cluster_database_admin` command to output database secrets:
+  The following example will create a KeyDB cluster with 2 nodes.
+
+  You may need to adjust the configuration to fit your needs.
+
+  Create a `main.tf` file at the root of your project, and fill it with your Elestio credentials:
+
+  ```hcl
+  {{ include "examples/doc/init.tf" }}
+  ```
+
+  Now you can use the module to create keydb nodes:
+
+  ```hcl
+  {{ include "examples/doc/module.tf" }}
+  ```
+
+  Finally, let's add some outputs to retrieve useful information:
+
+  ```hcl
+  {{ include "examples/doc/outputs.tf" }}
+  ```
+
+  You can now run `terraform init` and `terraform apply` to create your KeyDB cluster.
+  After a few minutes, the cluster will be ready to use.
+  You can access your outputs with `terraform output`:
+
+  ```bash
+  $ terraform output nodes_admins
+  $ terraform output nodes_database_admins
+  ```
+
+  If you want to update some parameters, you can edit the `main.tf` file and run `terraform apply` again.
+  Terraform will automatically update the cluster to match the new configuration.
+  Please note that changing the node count requires to change the .env of existing nodes. This is done automatically by the module.
+
+  ## Ready-to-deploy example
+
+  We created a ready-to-deploy example which creates the same infrastructure as the previous example.
+  You can find it [here](https://github.com/elestio-examples/terraform-elestio-keydb-cluster/tree/main/examples/get_started).
+  Follow the instructions to deploy the example.
+
+  ## How to use the cluster
+
+  Use `terraform output nodes_database_admins` command to output database secrets:
 
   ```bash
   {{ include "examples/doc/readme_output.sh" }}
@@ -54,16 +103,6 @@ content: |-
   ```js
   {{ include "examples/doc/readme_how_to_use.js" }}
   ```
-
-  ## Scale the nodes
-
-  To adjust the cluster size:
-
-  - Adding nodes: Run `terraform apply` after adding a new node in the config, and it will be seamlessly integrated into the cluster.
-  - Removing nodes: The excess nodes will cleanly leave the cluster on the next `terraform apply`.
-
-  Please note that changing the node count requires to change the .env of existing nodes. This is done automatically by the module.
-
   {{ .Footer }}
   {{ .Inputs }}
   {{ .Modules }}

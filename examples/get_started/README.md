@@ -1,6 +1,6 @@
-# Get started : KeyDB Cluster with Terraform and Elestio
+# Example: Get Started with KeyDB Cluster, Terraform and Elestio
 
-In this example, you will learn how to use this module to deploy your own KeyDB cluster with Elestio.
+In this example you will learn how to use this module to deploy your own KeyDB cluster easily.
 
 Some knowledge of [terraform](https://developer.hashicorp.com/terraform/intro) is recommended, but if not, the following instructions are sufficient.
 
@@ -39,29 +39,13 @@ Some knowledge of [terraform](https://developer.hashicorp.com/terraform/intro) i
 3. You can use the `terraform output` command to print the output block of your main.tf file:
 
    ```bash
-   terraform output keydb_cluster_admin # RedisInsight secrets
-   terraform output keydb_cluster_database_admin # Database secrets
+   terraform output nodes_admins # RedisInsight secrets
+   terraform output nodes_database_admins # Database secrets
    ```
 
 ## Testing
 
-Use `terraform output keydb_cluster_admin` command to output RedisInsight secrets:
-
-```bash
-# keydb_cluster_admin
-{
-  "keydb-france" = {
-    "password" = "*****"
-    "url" = "https://keydb-france-u525.vm.elestio.app:24814/"
-    "user" = "root"
-  }
-  "keydb-netherlands" = {
-    "password" = "*****"
-    "url" = "https://keydb-netherlands-u525.vm.elestio.app:24814/"
-    "user" = "root"
-  }
-}
-```
+Use `terraform output nodes_admins` command to output RedisInsight secrets:
 
 Log in to both URLs with the credentials.
 
@@ -71,51 +55,6 @@ You should be able to retrieve the value of your key on the second node.
 You can try turning off the first node on the [Elestio dashboard](https://dash.elest.io/).
 The second node remains functional.
 When you restart it, it automatically updates with the new data.
-
-## How to use Multi-Master cluster
-
-Use `terraform output keydb_cluster_database_admin` command to output database secrets:
-
-```bash
-# keydb_cluster_database_admin
-{
-  "keydb-france" = {
-    "command" = "redis-cli -h keydb-france-u525.vm.elestio.app -p 23647 -a '*****'"
-    "host" = "keydb-france-u525.vm.elestio.app"
-    "password" = "*****"
-    "port" = "23647"
-    "user" = "root"
-  }
-  "keydb-netherlands" = {
-    "command" = "redis-cli -h keydb-netherlands-u525.vm.elestio.app -p 23647 -a '*****'"
-    "host" = "keydb-netherlands-u525.vm.elestio.app"
-    "password" = "*****"
-    "port" = "23647"
-    "user" = "root"
-  }
-}
-```
-
-Here is an example of how to use the KeyDB cluster and all its nodes in the Javascript client.
-
-```js
-// Javascript example
-const Redis = require('ioredis');
-
-const cluster = new Redis.Cluster([
-  { port: 23647, password: '****', host: 'keydb-france-u525.vm.elestio.app' },
-  {
-    port: 23647,
-    password: '****',
-    host: 'keydb-netherlands-u525.vm.elestio.app',
-  },
-]);
-
-cluster.set('foo', 'bar');
-cluster.get('foo', (err, res) => {
-  // res === 'bar'
-});
-```
 
 ## Scale the nodes
 
