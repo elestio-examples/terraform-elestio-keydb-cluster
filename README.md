@@ -221,19 +221,19 @@ No modules.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_elestio"></a> [elestio](#provider\_elestio) | = 0.12.1 |
-| <a name="provider_null"></a> [null](#provider\_null) | = 3.2.0 |
+| <a name="provider_elestio"></a> [elestio](#provider\_elestio) | >= 0.14.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | >= 3.2.0 |
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_elestio"></a> [elestio](#requirement\_elestio) | = 0.12.1 |
-| <a name="requirement_null"></a> [null](#requirement\_null) | = 3.2.0 |
+| <a name="requirement_elestio"></a> [elestio](#requirement\_elestio) | >= 0.14.0 |
+| <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.2.0 |
 ## Resources
 
 | Name | Type |
 |------|------|
-| [elestio_keydb.nodes](https://registry.terraform.io/providers/elestio/elestio/0.12.1/docs/resources/keydb) | resource |
-| [null_resource.update_nodes_env](https://registry.terraform.io/providers/hashicorp/null/3.2.0/docs/resources/resource) | resource |
+| [elestio_keydb.nodes](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/keydb) | resource |
+| [null_resource.update_nodes_env](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 <!-- END_TF_DOCS -->
